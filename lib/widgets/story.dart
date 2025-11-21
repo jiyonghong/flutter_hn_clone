@@ -3,16 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hn_clone/models/story.dart';
 import 'package:humanize/humanize.dart';
 
-class StoryWidget extends StatefulWidget {
+class StoryWidget extends StatelessWidget {
   final Story story;
+  final bool? isBookmarked;
+  final VoidCallback? onToggleBookmark;
 
-  const StoryWidget({super.key, required this.story});
+  const StoryWidget({
+    super.key,
+    required this.story,
+    this.isBookmarked,
+    this.onToggleBookmark,
+  });
 
-  @override
-  State<StoryWidget> createState() => _StoryWidgetState();
-}
-
-class _StoryWidgetState extends State<StoryWidget> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -28,14 +30,14 @@ class _StoryWidgetState extends State<StoryWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.story.title, style: textTheme.headlineSmall),
+            Text(story.title, style: textTheme.headlineSmall),
             Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text('by ', style: textTheme.bodyMedium),
                 Text(
-                  widget.story.by,
+                  story.by,
                   style: textTheme.bodyLarge?.copyWith(
                     color: Colors.blueAccent,
                     fontWeight: FontWeight.w500,
@@ -44,9 +46,7 @@ class _StoryWidgetState extends State<StoryWidget> {
                 const SizedBox(width: 16),
                 Text(
                   naturaltime(
-                    DateTime.fromMillisecondsSinceEpoch(
-                      widget.story.time * 1000,
-                    ),
+                    DateTime.fromMillisecondsSinceEpoch(story.time * 1000),
                   ),
                   style: textTheme.bodyMedium,
                 ),
@@ -60,14 +60,19 @@ class _StoryWidgetState extends State<StoryWidget> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.bookmark_outline),
+                      icon: Icon(
+                        isBookmarked == true
+                            ? Icons.bookmark
+                            : Icons.bookmark_outline,
+                      ),
                       onPressed: () {
+                        onToggleBookmark?.call();
                         HapticFeedback.lightImpact();
                       },
                     ),
                     Badge(
-                      label: Text('${widget.story.kids?.length}'),
-                      isLabelVisible: widget.story.kids != null,
+                      label: Text('${story.kids?.length}'),
+                      isLabelVisible: story.kids != null,
                       offset: const Offset(-4, 4),
                       textColor: Colors.white,
                       backgroundColor: Colors.blueAccent,
@@ -83,7 +88,7 @@ class _StoryWidgetState extends State<StoryWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: widget.story.text != null
+                  children: story.text != null
                       ? [
                           Text(
                             'Read more ',

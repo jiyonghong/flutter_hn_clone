@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hn_clone/db/database.dart';
 import 'package:flutter_hn_clone/screens/home.dart';
+import 'package:flutter_hn_clone/states/tab_bar_notifier.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AppDatabase>(
+          create: (_) => AppDatabase(),
+          dispose: (context, db) => db.close(),
+        ),
+        ChangeNotifierProvider<TabBarNotifier>(create: (_) => TabBarNotifier()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

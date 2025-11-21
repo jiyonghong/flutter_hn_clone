@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hn_clone/models/pagination.dart';
-import 'package:flutter_hn_clone/utils/tab_bar_visibility_notifier.dart';
+import 'package:flutter_hn_clone/states/tab_bar_notifier.dart';
 import 'package:flutter_hn_clone/widgets/loading.dart';
+import 'package:provider/provider.dart';
 
-class PagingState<T, K> {
+class PaginationState<T, K> {
   bool isLoading;
   bool hasMore;
   Exception? error;
   final List<Pagination<T>>? pages;
   final List<K>? keys;
 
-  PagingState({
+  PaginationState({
     this.isLoading = false,
     this.hasMore = true,
     this.error,
@@ -19,14 +20,14 @@ class PagingState<T, K> {
     this.keys,
   });
 
-  PagingState<T, K> copyWith({
+  PaginationState<T, K> copyWith({
     bool? isLoading,
     bool? hasMore,
     Exception? error,
     List<Pagination<T>>? pages,
     List<K>? keys,
   }) {
-    return PagingState<T, K>(
+    return PaginationState<T, K>(
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
       error: error ?? this.error,
@@ -44,13 +45,13 @@ class PagingState<T, K> {
       [];
 }
 
-class PagingController<T, K> extends ChangeNotifier {
+class PaginationController<T, K> extends ChangeNotifier {
   final K Function(Pagination<T>? lastPage) getNextPageKey;
   final Future<Pagination<T>> Function(K key) fetchPage;
 
-  PagingState<T, K> state = PagingState<T, K>();
+  PaginationState<T, K> state = PaginationState<T, K>();
 
-  PagingController({required this.getNextPageKey, required this.fetchPage});
+  PaginationController({required this.getNextPageKey, required this.fetchPage});
 
   Future<void> _load() async {
     try {
@@ -85,27 +86,26 @@ class PagingController<T, K> extends ChangeNotifier {
       return;
     }
 
-    state = PagingState();
+    state = PaginationState();
     await _load();
   }
 }
 
-class InfiniteScrollBuilder<T, K> extends StatefulWidget {
-  final PagingController<T, K> controller;
+class PaginationBuilder<T, K> extends StatefulWidget {
+  final PaginationController<T, K> controller;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
 
-  const InfiniteScrollBuilder({
+  const PaginationBuilder({
     super.key,
     required this.controller,
     required this.itemBuilder,
   });
 
   @override
-  State<StatefulWidget> createState() => _InfiniteScrollBuilderState<T, K>();
+  State<StatefulWidget> createState() => _PaginationBuilderState<T, K>();
 }
 
-class _InfiniteScrollBuilderState<T, K>
-    extends State<InfiniteScrollBuilder<T, K>> {
+class _PaginationBuilderState<T, K> extends State<PaginationBuilder<T, K>> {
   final ScrollController _scrollController = ScrollController();
   late TabBarNotifier? _tabBarNotifier;
   bool _showTopFade = false;
@@ -123,7 +123,7 @@ class _InfiniteScrollBuilderState<T, K>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _tabBarNotifier = TabBarProvider.read(context);
+    _tabBarNotifier = context.read<TabBarNotifier>();
   }
 
   @override
