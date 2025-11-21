@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter_hn_clone/repositories/story_repository.dart';
 import 'package:flutter_hn_clone/utils/api.dart';
 
 class HNService {
-  Future<Map<String, dynamic>> fetchStory(int id) async {
+  Future<Map<String, dynamic>> fetchItem(int id) async {
     final response = await api(
       'https://hacker-news.firebaseio.com/v0/item/$id.json',
     );
@@ -15,39 +16,15 @@ class HNService {
     }
   }
 
-  Future<List<int>> fetchTopStoryIds() async {
+  Future<List<int>> fetchStoryIds(StoryType type) async {
     final response = await api(
-      'https://hacker-news.firebaseio.com/v0/topstories.json',
+      'https://hacker-news.firebaseio.com/v0/${type.value}.json',
     );
 
     if (response case Ok()) {
       return List<int>.from(response.data);
     } else {
-      throw HttpException('Failed to fetch top stories');
-    }
-  }
-
-  Future<List<int>> fetchNewStoryIds() async {
-    final response = await api(
-      'https://hacker-news.firebaseio.com/v0/newstories.json',
-    );
-
-    if (response case Ok()) {
-      return List<int>.from(response.data);
-    } else {
-      throw HttpException('Failed to fetch new stories');
-    }
-  }
-
-  Future<List<int>> fetchBestStoryIds() async {
-    final response = await api(
-      'https://hacker-news.firebaseio.com/v0/beststories.json',
-    );
-
-    if (response case Ok()) {
-      return List<int>.from(response.data);
-    } else {
-      throw HttpException('Failed to fetch best stories');
+      throw HttpException('Failed to fetch ${type.value}');
     }
   }
 }

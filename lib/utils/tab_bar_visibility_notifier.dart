@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-class TabBarVisibilityNotifier extends ChangeNotifier {
+class TabBarNotifier extends ChangeNotifier {
   bool _isVisible = true;
 
   bool get isVisible => _isVisible;
@@ -20,4 +20,20 @@ class TabBarVisibilityNotifier extends ChangeNotifier {
   }
 }
 
-final tabBarVisibilityNotifier = TabBarVisibilityNotifier();
+class TabBarProvider extends InheritedNotifier<TabBarNotifier> {
+  const TabBarProvider({
+    super.key,
+    required TabBarNotifier super.notifier,
+    required super.child,
+  });
+
+  static TabBarNotifier of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<TabBarProvider>()!
+        .notifier!;
+  }
+
+  static TabBarNotifier? read(BuildContext context) {
+    return context.getInheritedWidgetOfExactType<TabBarProvider>()?.notifier;
+  }
+}

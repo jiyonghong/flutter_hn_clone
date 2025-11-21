@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class LoadingWidget extends StatelessWidget {
   final double translateY;
 
-  const LoadingWidget({super.key, this.translateY = -50});
+  const LoadingWidget({super.key, this.translateY = 0});
 
   @override
   Widget build(BuildContext context) {
