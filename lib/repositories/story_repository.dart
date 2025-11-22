@@ -16,27 +16,6 @@ abstract class IStoryRepository {
   Future<List<int>> fetchStoryIds(StoryType type);
 }
 
-Pagination<T> paginate<T>(List<T> items, int page, [int limit = 20]) {
-  final startIndex = (page - 1) * limit;
-  final endIndex = startIndex + limit;
-
-  if (items.length < endIndex) {
-    return Pagination(
-      page: page,
-      limit: limit,
-      hasNext: false,
-      items: items.sublist(startIndex),
-    );
-  }
-
-  return Pagination(
-    page: page,
-    limit: limit,
-    hasNext: true,
-    items: items.sublist(startIndex, endIndex),
-  );
-}
-
 class StoryRepository implements IStoryRepository {
   final HNService hnService;
 

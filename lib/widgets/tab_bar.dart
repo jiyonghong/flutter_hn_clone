@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hn_clone/states/tab_bar_notifier.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 
 class HomeTabBar extends StatelessWidget {
@@ -14,7 +15,6 @@ class HomeTabBar extends StatelessWidget {
 
     final tabBarWidget = Container(
       width: 250,
-      height: 60,
       padding: EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
         color: themeData.cardColor,
@@ -28,28 +28,41 @@ class HomeTabBar extends StatelessWidget {
           ),
         ],
       ),
-      child: TabBar(
-        dividerColor: Colors.transparent,
-        controller: controller,
-        indicator: BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
-        indicatorSize: TabBarIndicatorSize.label,
-        labelColor: Colors.white,
-        unselectedLabelColor: themeData.textTheme.labelLarge!.color,
-        splashFactory: NoSplash.splashFactory,
-        tabs: [
-          Container(
-            padding: EdgeInsets.all(8.0),
-            child: Tab(icon: Icon(Icons.newspaper, size: 28)),
-          ),
-          Container(
-            padding: EdgeInsets.all(8.0),
-            child: Tab(icon: Icon(Icons.whatshot, size: 28)),
-          ),
-          Container(
-            padding: EdgeInsets.all(8.0),
-            child: Tab(icon: Icon(Icons.thumb_up, size: 28)),
-          ),
-        ],
+      child: SizedBox(
+        child: TabBar(
+          padding: EdgeInsets.zero,
+          dividerColor: Colors.transparent,
+          controller: controller,
+          indicator: BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelColor: Colors.white,
+          labelPadding: EdgeInsets.all(2.0),
+          unselectedLabelColor: themeData.textTheme.labelLarge!.color,
+          splashFactory: NoSplash.splashFactory,
+          tabs: [
+            Tab(
+              icon: HeroIcon(
+                HeroIcons.newspaper,
+                size: 28,
+                style: HeroIconStyle.solid,
+              ),
+            ),
+            Tab(
+              icon: HeroIcon(
+                HeroIcons.fire,
+                size: 28,
+                style: HeroIconStyle.solid,
+              ),
+            ),
+            Tab(
+              icon: HeroIcon(
+                HeroIcons.handThumbUp,
+                size: 28,
+                style: HeroIconStyle.solid,
+              ),
+            ),
+          ],
+        ),
       ),
     );
 

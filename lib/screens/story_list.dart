@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hn_clone/controllers/story_list_controller.dart';
 import 'package:flutter_hn_clone/db/database.dart';
 import 'package:flutter_hn_clone/models/story.dart';
-import 'package:flutter_hn_clone/repositories/story_repository.dart';
 import 'package:flutter_hn_clone/widgets/pagination_builder.dart';
 import 'package:flutter_hn_clone/widgets/story.dart';
 import 'package:provider/provider.dart';
 
 class StoryPaginationScreen extends StatefulWidget {
-  final StoryType storyType;
+  final StoryPaginationController controller;
 
-  const StoryPaginationScreen({super.key, required this.storyType});
+  const StoryPaginationScreen({super.key, required this.controller});
 
   @override
   State<StoryPaginationScreen> createState() => _StoryPaginationScreenState();
@@ -20,7 +19,7 @@ class StoryPaginationScreen extends StatefulWidget {
 class _StoryPaginationScreenState extends State<StoryPaginationScreen>
     with AutomaticKeepAliveClientMixin {
   late final PaginationController<Story, int> _pagingController;
-  late final StoryPaginationController _controller;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   bool get wantKeepAlive => true;
@@ -28,20 +27,30 @@ class _StoryPaginationScreenState extends State<StoryPaginationScreen>
   @override
   void initState() {
     super.initState();
-    _controller = StoryPaginationController(storyType: widget.storyType);
+
     _pagingController = PaginationController<Story, int>(
       fetchPage: (key) async {
-        await Future.delayed(const Duration(milliseconds: 1000));
-        return await _controller.fetchStories(page: key, limit: 10);
+        await Future.delayed(const Duration(seconds: 1));
+        return await widget.controller.fetchStories(page: key, limit: 10);
       },
       getNextPageKey: (lastPage) => lastPage != null ? lastPage.page + 1 : 1,
     );
+    widget.controller.addListener(_scrollToTop);
   }
 
   @override
   void dispose() {
     _pagingController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -57,6 +66,7 @@ class _StoryPaginationScreenState extends State<StoryPaginationScreen>
 
         return PaginationBuilder(
           controller: _pagingController,
+          scrollController: _scrollController,
           itemBuilder: (context, item, index) {
             return StoryWidget(
               story: item,

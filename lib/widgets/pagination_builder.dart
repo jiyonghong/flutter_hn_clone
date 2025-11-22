@@ -93,11 +93,13 @@ class PaginationController<T, K> extends ChangeNotifier {
 
 class PaginationBuilder<T, K> extends StatefulWidget {
   final PaginationController<T, K> controller;
+  final ScrollController scrollController;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
 
   const PaginationBuilder({
     super.key,
     required this.controller,
+    required this.scrollController,
     required this.itemBuilder,
   });
 
@@ -106,7 +108,6 @@ class PaginationBuilder<T, K> extends StatefulWidget {
 }
 
 class _PaginationBuilderState<T, K> extends State<PaginationBuilder<T, K>> {
-  final ScrollController _scrollController = ScrollController();
   late TabBarNotifier? _tabBarNotifier;
   bool _showTopFade = false;
   bool _isInitialLoading = true;
@@ -116,7 +117,7 @@ class _PaginationBuilderState<T, K> extends State<PaginationBuilder<T, K>> {
     super.initState();
 
     _loadMore();
-    _scrollController.addListener(_onScroll);
+    widget.scrollController.addListener(_onScroll);
     widget.controller.addListener(_onStateChanged);
   }
 
@@ -126,21 +127,15 @@ class _PaginationBuilderState<T, K> extends State<PaginationBuilder<T, K>> {
     _tabBarNotifier = context.read<TabBarNotifier>();
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   void _onScroll() {
-    final shouldTopFade = _scrollController.offset > 0;
+    final shouldTopFade = widget.scrollController.offset > 0;
     if (_showTopFade != shouldTopFade) {
       setState(() {
         _showTopFade = shouldTopFade;
       });
     }
 
-    final direction = _scrollController.position.userScrollDirection;
+    final direction = widget.scrollController.position.userScrollDirection;
     if (direction == ScrollDirection.reverse) {
       _tabBarNotifier?.hide();
     }
@@ -152,8 +147,8 @@ class _PaginationBuilderState<T, K> extends State<PaginationBuilder<T, K>> {
       return;
     }
 
-    if (_scrollController.position.pixels >
-        _scrollController.position.maxScrollExtent - 100) {
+    if (widget.scrollController.position.pixels >
+        widget.scrollController.position.maxScrollExtent - 100) {
       _loadMore();
     }
   }
@@ -196,7 +191,7 @@ class _PaginationBuilderState<T, K> extends State<PaginationBuilder<T, K>> {
                   ? 20.0
                   : MediaQuery.of(context).padding.bottom,
             ),
-            controller: _scrollController,
+            controller: widget.scrollController,
             separatorBuilder: (context, index) => const SizedBox(height: 6),
             itemCount: pageState.hasMore
                 ? pageState.items.length + 1

@@ -8,5 +8,5 @@ class Bookmarks extends Table {
   IntColumn get time => integer()();
   TextColumn get url => text().nullable()();
   TextColumn get content => text().nullable()();
-  IntColumn get score => integer().nullable()();
+  IntColumn get score => integer()();
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hn_clone/controllers/story_list_controller.dart';
 import 'package:flutter_hn_clone/repositories/story_repository.dart';
 import 'package:flutter_hn_clone/screens/story_list.dart';
-import 'package:flutter_hn_clone/states/tab_bar_notifier.dart';
 import 'package:flutter_hn_clone/widgets/tab_bar.dart';
-import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,13 +15,35 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
+  final StoryPaginationController _newsController = StoryPaginationController(
+    storyType: StoryType.news,
+  );
+  final StoryPaginationController _topController = StoryPaginationController(
+    storyType: StoryType.top,
+  );
+  final StoryPaginationController _bestController = StoryPaginationController(
+    storyType: StoryType.best,
+  );
+
+  void _scrollToTop() {
+    switch (_tabController.index) {
+      case 0:
+        _newsController.scrollToTop();
+      case 1:
+        _topController.scrollToTop();
+      case 2:
+        _bestController.scrollToTop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final tabBarNotifier = context.read<TabBarNotifier>();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('HackerNews', style: TextStyle(fontFamily: 'Domine')),
+        title: GestureDetector(
+          onTap: _scrollToTop,
+          child: Text('HackerNews', style: TextStyle(fontFamily: 'Domine')),
+        ),
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0.0,
       ),
@@ -30,9 +51,9 @@ class _HomeScreenState extends State<HomeScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          StoryPaginationScreen(storyType: StoryType.news),
-          StoryPaginationScreen(storyType: StoryType.top),
-          StoryPaginationScreen(storyType: StoryType.best),
+          StoryPaginationScreen(controller: _newsController),
+          StoryPaginationScreen(controller: _topController),
+          StoryPaginationScreen(controller: _bestController),
         ],
       ),
 
@@ -49,6 +70,6 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, initialIndex: 1, vsync: this);
   }
 }
